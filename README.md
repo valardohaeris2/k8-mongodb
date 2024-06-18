@@ -1,12 +1,15 @@
-# mongodb and mongo express k8 deployment
+# MongoDB and Mongo Express web-app on k8
 
-Setup a mongoDB app and mongo express web-app using a k8 statefulset
+Setup a mongoDB app and mongo express web-app using a k8 statefulset.
 
-1. Create mongoDB pod.
+The client request flow is as follows:  
+request comes from browser >> through External Service of mongo-express >> fwds traffic to mongo-express pod >> mongo-express pod connects to Internal Service of mongoDB (dB URL) >> mongoDB Internal Service fwds traffic to the mongoDB pod >> authentication using the Secret
 
-Check DockerHub for how to use the image (ports, pwds, etc). Leave username & pwd value empty b/c configMaps are checked into code repos.
+1. **Create mongoDB pod**
 
-example Pod config:
+Check DockerHub for how to use the image (ports, pwds, etc). Leave username & pwd value empty. A configMap & Secret will be created to reference these values.
+
+## example Pod config:
 
 ```
     apiVersion: apps/v1
@@ -39,4 +42,18 @@ example Pod config:
               value:
             - name: MONGO_ROOT_PASSWORD
           value:
+```
+
+2. **Create Secrets that contain dB username and password authN credentials**
+   ## a. Create a mongo-secret.yaml
+
+```
+ apiVersion: v1
+ kind: Secret
+ metadata:
+   name: mongodb-secret
+ type: Opaque
+ data:
+   mongo-root-username:
+   mongo-root-password:
 ```
