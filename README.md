@@ -1,5 +1,13 @@
 # MongoDB and Mongo Express web-app on k8
 
+## Pre-reqs:
+
+- Minikube installed and started
+- Docker Desktop running
+- (optional) add an alias to your zsh/bash profile where `alias k=kubectl`. This will prevent you from having to type `kubectl` and instead use `k`.
+
+## Overview:
+
 Setup a mongoDB app and mongo express web-app using a k8 statefulset.
 
 **The client request flow is as follows:**  
@@ -82,4 +90,4 @@ Check DockerHub for how to use the image (ports, pwds, etc). Leave username & pw
 
 ## e. Create the secret from the secret configFile:
 
-    `k apply -f mongo-secret.yaml`
+`kubectl -f mongo-secret.yaml`
