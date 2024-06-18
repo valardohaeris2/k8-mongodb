@@ -45,7 +45,8 @@ Check DockerHub for how to use the image (ports, pwds, etc). Leave username & pw
 ```
 
 2. **Create Secrets that contain dB username and password authN credentials**
-   ## a. Create a mongo-secret.yaml
+
+## a. Create a mongo-secret.yaml
 
 ```
  apiVersion: v1
@@ -57,3 +58,28 @@ Check DockerHub for how to use the image (ports, pwds, etc). Leave username & pw
    mongo-root-username:
    mongo-root-password:
 ```
+
+## b. base64 encode the username:
+
+`echo -n 'arya stark' | base64`
+
+## c. base64 encode password:
+
+`echo -n 'needle' | base64`
+
+## d. paste the encoded values into the mongo-secret.yaml:
+
+```
+    apiVersion: v1
+    kind: Secret
+    metadata:
+      name: mongodb-secret
+    type: Opaque
+    data:
+      mongo-root-username: YX....          <=paste
+      mongo-root-password: bmVl....        <=paste
+```
+
+## e. Create the secret from the secret configFile:
+
+    `k apply -f mongo-secret.yaml`
