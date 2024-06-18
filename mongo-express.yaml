@@ -1,0 +1,72 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mongo-express
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: mongo-express
+  template:
+    metadata:
+      labels:
+        app: mongo-express
+    spec:
+      containers:
+        - name: mongo-express
+          image: mongo-express:1.0.2
+          resources:
+            limits:
+              memory: "128Mi"
+              cpu: "500m"
+          ports:
+            - containerPort: 8081
+          env:
+            - name: ME_CONFIG_MONGODB_ADMIN_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: mongodb-secret
+                  key: mongo-root-username
+            - name: ME_CONFIG_MONGODB_ADMIN_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: mongodb-secret
+                  key: mongo-root-username
+            - name: ME_CONFIG_MONGODB_SERVER
+              valueFrom:
+                configMapKeyRef:
+                  name: mongodb-configmap
+                  key: database_url
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: mongo-express-service
+spec:
+  selector:
+    app: mongo-express
+  type: LoadBalancer
+  ports:
+    - port: 8081 # the internal IP address's port
+      targetPort: 8081
+      nodePort: 30000 # the external IP address's port
+
+# apiVersion: networking.k8s.io/v1
+# kind: Ingress
+# metadata:
+#   name: mongo-express-ingress
+#   labels:
+#     name: myingress
+# spec:
+#   rules:
+#   - host: vault.winterfell.com   #anything that comes in from here must go through the backend service. This must be a valid DNS name and it's domain name should map to a Node's IP addy that will serve as the entrypoint to the k8 cluster
+#     http:
+#       paths:
+#       - pathType: Prefix
+#         path: "/"
+#         backend:                  # the target where internal request will be redirected. ServiceName should match the Internal service name
+#           service:
+#             name: <Service>
+#             port:
+#               number: <Port>          # Ingress servicePort should match the internal service "port"
+

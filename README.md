@@ -90,4 +90,45 @@ Check DockerHub for how to use the image (ports, pwds, etc). Leave username & pw
 
 ## e. Create the secret from the secret configFile:
 
-`kubectl -f mongo-secret.yaml`
+`kubectl -f mongo-secret.yaml` or `k -f mongo-secret.yaml`
+
+## f. Reference the secret values in the mongo.yaml Deployment file:
+
+```
+    apiVersion: apps/v1
+    kind: Deployment
+    metadata:
+      name: mongodb-deployment
+      labels:
+        app: mongodb
+    spec:
+      replicas: 1
+      selector:
+        matchLabels:
+          app: mongodb
+      template:
+        metadata:
+          labels:
+            app: mongodb
+        spec:
+          containers:
+            - name: mongodb
+              image: mongo
+              resources:
+                limits:
+                  memory: "128Mi"
+                  cpu: "500m"
+              ports:
+                - containerPort: 27017
+              env:
+                - name: MONGO_ROOT_USERNAME
+                  valueFrom:
+                    secretKeyRef:                                 <= Reference username
+                      name: mongodb-secret
+                      key: mongo-root-username
+                - name: MONGO_ROOT_PASSWORD
+                  valueFrom:
+                    secretKeyRef:                                 <= Reference password
+                      name: mongodb-secret
+                  key: mongo-root-password
+```
