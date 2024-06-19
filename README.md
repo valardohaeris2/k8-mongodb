@@ -1,4 +1,4 @@
-# MongoDB and Mongo Express k8 Deployment
+# MongoDB and Mongo Express kubernetes Deployment
 
 ## Pre-reqs:
 
