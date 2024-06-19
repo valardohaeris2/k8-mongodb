@@ -1,4 +1,4 @@
-# MongoDB and Mongo Express web-app on k8
+# MongoDB and Mongo Express k8 Deployment
 
 ## Pre-reqs:
 
@@ -16,11 +16,11 @@ request comes from browser >> through External Service of mongo-express >> fwds 
 
 ## Workflow
 
-1. **Create mongoDB pod**
+## 1. Create mongoDB pod
 
 Check DockerHub for how to use the image (ports, pwds, etc). Leave username & pwd value empty. A configMap & Secret will be created to reference these values.
 
-## example mongoDB Pod config:
+**example mongoDB Pod config:**
 
 ```
     apiVersion: apps/v1
@@ -55,9 +55,9 @@ Check DockerHub for how to use the image (ports, pwds, etc). Leave username & pw
           value:
 ```
 
-2. **Create Secrets that contain dB username and password authN credentials**
+## 2. Create Secrets that contain dB username and password authN credentials
 
-## a. Create a mongo-secret.yaml
+**a. Create a `mongo-secret.yaml`**
 
 ```
  apiVersion: v1
@@ -70,15 +70,15 @@ Check DockerHub for how to use the image (ports, pwds, etc). Leave username & pw
    mongo-root-password:
 ```
 
-## b. base64 encode the username:
+**b. base64 encode the username:**
 
 `echo -n 'arya stark' | base64`
 
-## c. base64 encode password:
+**c. base64 encode password:**
 
 `echo -n 'needle' | base64`
 
-## d. paste the encoded values into the mongo-secret.yaml:
+**d. paste the encoded values into the `mongo-secret.yaml`:**
 
 ```
     apiVersion: v1
@@ -91,13 +91,13 @@ Check DockerHub for how to use the image (ports, pwds, etc). Leave username & pw
       mongo-root-password: bmVl....        <=paste
 ```
 
-## e. Create the secret from the secret configFile:
+**e. Create the secret from the secret configFile:**
 
        The secret must be created before deploying the mongoDB Pod.
 
 `kubectl -f mongo-secret.yaml` or `k -f mongo-secret.yaml`
 
-## f. Reference the secret values in the `mongo.yaml` Deployment file:
+**f. Reference the secret values in the `mongo.yaml` configfile:**
 
 ```
     apiVersion: apps/v1
@@ -128,45 +128,46 @@ Check DockerHub for how to use the image (ports, pwds, etc). Leave username & pw
               env:
                 - name: MONGO_ROOT_USERNAME
                   valueFrom:
-                    secretKeyRef:                                 <= Reference username
+                    secretKeyRef:                  <= Reference username
                       name: mongodb-secret
                       key: mongo-root-username
                 - name: MONGO_ROOT_PASSWORD
                   valueFrom:
-                    secretKeyRef:                                 <= Reference password
+                    secretKeyRef:                  <= Reference password
                       name: mongodb-secret
                   key: mongo-root-password
 ```
 
-## g. Deploy the `mongo.yaml`
+**g. Deploy the `mongo.yaml`:**
 
 `k apply -f mongo.yaml`
 `k get pod`
 
-3. **Create a mongodb Internal Service to allow communication w/ the mongoDB Pod**
-   Use "selector" of the Service and the "label" of the Pod to connect the Pod to the Service.
+## 3. Create a mongodb Internal Service to allow communication w/ the mongoDB Pod
 
-   ```
-       ---          <= Add the service configFile to the mongo Deployment configFile
-       apiVersion: v1
-       kind: Service
-       metadata:
-         name: mongodb-service
-       spec:
-         selector:
-           app: mongodb
-         ports:
-           - port: 27017
-             targetPort: 27017
-   ```
+Use "selector" of the Service and the "label" of the Pod to connect the Pod to the Service.
 
-   `k apply -f mongo.yaml`
+```
+    ---                  <= Add the separator
+    apiVersion: v1
+    kind: Service
+    metadata:
+      name: mongodb-service
+    spec:
+      selector:
+        app: mongodb
+      ports:
+        - port: 27017
+          targetPort: 27017
+```
 
-4. **Create mongo-express deployment**
+`k apply -f mongo.yaml`
 
-## Pass the mongoDB username/password credentials & dB URL to Mongo Express by using the mongo-express deployment.yaml file, env-vars and a ConfigMap
+## 4. Create mongo-express deployment:
 
-## a. Create Deployment configFile `mongo-express.yaml`:
+Pass the mongoDB username/password credentials & dB URL to Mongo Express by using the mongo-express deployment.yaml file, env-vars and a ConfigMap
+
+**a. Create Deployment configFile `mongo-express.yaml`:**
 
         ```
               apiVersion: apps/v1
@@ -206,7 +207,7 @@ Check DockerHub for how to use the image (ports, pwds, etc). Leave username & pw
                           - name: ME_CONFIG_MONGODB_SERVER
         ```
 
-## b. Create a `mongo-configmap.yaml` to reference the dB URL:
+**b. Create a `mongo-configmap.yaml` to reference the dB URL:**
 
     ```
           apiVersion: v1
@@ -217,7 +218,7 @@ Check DockerHub for how to use the image (ports, pwds, etc). Leave username & pw
             database_url: mongodb-service
     ```
 
-## c. Reference the configMap w/i the env section of `mongo-express.yaml`:
+**c. Reference the configMap w/i the env section of `mongo-express.yaml`:**
 
     ```
      - name: ME_CONFIG_MONGODB_SERVER
@@ -227,6 +228,6 @@ Check DockerHub for how to use the image (ports, pwds, etc). Leave username & pw
            key: database_url
     ```
 
-## d. Apply the `mongo-configmap.yaml` & `mongo-express.yaml`:
+**d. Apply the `mongo-configmap.yaml` & `mongo-express.yaml`:**
 
 `k apply -f mongo-configmap.yaml`

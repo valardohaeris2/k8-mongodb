@@ -1,4 +1,12 @@
 {
-  "cSpell.words": ["arya", "configmap", "fwds", "pwds", "reqs", "statefulset"],
+  "cSpell.words": [
+    "arya",
+    "configfile",
+    "configmap",
+    "fwds",
+    "pwds",
+    "reqs",
+    "statefulset"
+  ],
   "cSpell.ignoreWords": ["MongoDB"]
 }
