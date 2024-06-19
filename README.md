@@ -4,6 +4,7 @@
 
 - Minikube installed and started
 - Docker Desktop running
+- Helm CLI
 - (optional) add an alias to your zsh/bash profile where `alias k=kubectl`. This will prevent you from having to type `kubectl` and instead use `k`.
 
 ## Overview:
@@ -13,11 +14,13 @@ Setup a mongoDB app and mongo express web-app using a k8 statefulset.
 **The client request flow is as follows:**  
 request comes from browser >> through External Service of mongo-express >> fwds traffic to mongo-express pod >> mongo-express pod connects to Internal Service of mongoDB (dB URL) >> mongoDB Internal Service fwds traffic to the mongoDB pod >> authentication using the Secret
 
+## Workflow
+
 1. **Create mongoDB pod**
 
 Check DockerHub for how to use the image (ports, pwds, etc). Leave username & pwd value empty. A configMap & Secret will be created to reference these values.
 
-## example Pod config:
+## example mongoDB Pod config:
 
 ```
     apiVersion: apps/v1
@@ -90,6 +93,8 @@ Check DockerHub for how to use the image (ports, pwds, etc). Leave username & pw
 
 ## e. Create the secret from the secret configFile:
 
+       The secret must be created before deploying the mongoDB Pod.
+
 `kubectl -f mongo-secret.yaml` or `k -f mongo-secret.yaml`
 
 ## f. Reference the secret values in the mongo.yaml Deployment file:
@@ -132,3 +137,27 @@ Check DockerHub for how to use the image (ports, pwds, etc). Leave username & pw
                       name: mongodb-secret
                   key: mongo-root-password
 ```
+
+## g. Deploy the mongo.yaml deployment
+
+`k apply -f mongo.yaml`
+`k get pod`
+
+3. **Create an Internal Service to allow communication w/ the mongoDB Pod**
+   Use "selector" of the Service and the "label" of the Pod to connect the Pod to the Service.
+
+   ```
+       ---          <= Add the service configFile to the mongo Deployment configFile
+       apiVersion: v1
+       kind: Service
+       metadata:
+         name: mongodb-service
+       spec:
+         selector:
+           app: mongodb
+         ports:
+           - port: 27017
+             targetPort: 27017
+   ```
+
+   `k apply -f mongo.yaml`
