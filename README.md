@@ -13,10 +13,10 @@ Setup a mongoDB app and mongo express web-app using a k8 statefulset.
 
 **The client request flow is as follows:**
 
-![request workflow](/mongo-request.drawio)
+![request workflow](mongo-request.drawio)
 request comes from browser >> through External Service of mongo-express >> fwds traffic to mongo-express pod >> mongo-express pod connects to Internal Service of mongoDB (dB URL) >> mongoDB Internal Service fwds traffic to the mongoDB pod >> authentication using the Secret
 
-## Workflow
+## 🏗️ Workflow 🏗️
 
 ## 1. Create mongoDB pod
 
