@@ -93,7 +93,7 @@ Check DockerHub for how to use the image (ports, pwds, etc). Leave username & pw
 
 **e. Create the secret from the secret configFile:**
 
-       The secret must be created before deploying the mongoDB Pod.
+The secret must be created before deploying the mongoDB Pod.
 
 `kubectl -f mongo-secret.yaml` or `k -f mongo-secret.yaml`
 
