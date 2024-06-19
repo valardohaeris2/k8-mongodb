@@ -140,8 +140,10 @@ The secret must be created before deploying the mongoDB Pod.
 
 **g. Deploy the `mongo.yaml`:**
 
-`k apply -f mongo.yaml`
-`k get pod`
+```
+k apply -f mongo.yaml
+k get pod
+```
 
 ## 3. Create a mongodb Internal Service to allow communication w/ the mongoDB Pod
 
