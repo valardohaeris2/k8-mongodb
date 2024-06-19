@@ -183,7 +183,7 @@ Pass the mongoDB username/password credentials & dB URL to Mongo Express by usin
 
 **a. Create Deployment configFile `mongo-express.yaml`:**
 
-        ```
+```
               apiVersion: apps/v1
               kind: Deployment
               metadata:
@@ -219,28 +219,28 @@ Pass the mongoDB username/password credentials & dB URL to Mongo Express by usin
                                 name: mongodb-secret
                                 key: mongo-root-username
                           - name: ME_CONFIG_MONGODB_SERVER
-        ```
+```
 
 **b. Create a `mongo-configmap.yaml` to reference the dB URL:**
 
-    ```
+```
           apiVersion: v1
           kind: ConfigMap
           metadata:
             name: mongodb-configmap
           data:
             database_url: mongodb-service
-    ```
+```
 
 **c. Reference the configMap w/i the env section of `mongo-express.yaml`:**
 
-    ```
+```
      - name: ME_CONFIG_MONGODB_SERVER
        valueFrom:
          configMapKeyRef:
            name: mongodb-configmap
            key: database_url
-    ```
+```
 
 **d. Apply the `mongo-configmap.yaml` & `mongo-express.yaml`:**
 
