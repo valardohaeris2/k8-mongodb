@@ -59,6 +59,7 @@ Check DockerHub for how to use the image (ports, pwds, etc). Leave username & pw
 
 ## 2. Create Secrets that contain dB username and password authN credentials
 
+🔥 In a production environment, use an external secrets manager like Vault sidecar agent, Vault Secrets Operator, KMS encryption, etc.
 **a. Create a `mongo-secret.yaml`**
 
 ```
