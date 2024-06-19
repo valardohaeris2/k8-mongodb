@@ -171,7 +171,11 @@ Use "selector" of the Service and the "label" of the Pod to connect the Pod to t
           targetPort: 27017
 ```
 
-`k apply -f mongo.yaml`
+Deploy the `mongo.yaml`
+
+```
+k apply -f mongo.yaml
+```
 
 ## 4. Create mongo-express deployment:
 
@@ -240,4 +244,43 @@ Pass the mongoDB username/password credentials & dB URL to Mongo Express by usin
 
 **d. Apply the `mongo-configmap.yaml` & `mongo-express.yaml`:**
 
-`k apply -f mongo-configmap.yaml`
+```
+k apply -f mongo-configmap.yaml
+```
+
+```
+k apply -f mongo-express.yaml
+```
+
+## 5. Make the mongo-express service externally accessible:
+
+Create an _external service_ in the same file as the `mongo-express.yaml`.
+A "load balancer" accepts external requests by assigning the service an external IP address. nodePort is the port where the external IP address is open. This is the port we'll use in the browser to access the mongo-express service. Must be between 30000-32767.
+
+```
+      ---
+      apiVersion: v1
+      kind: Service
+      metadata:
+        name: mongo-express-service
+      spec:
+        selector:
+          app: mongo-express
+        type: LoadBalancer                                <= Type = load balancer
+        ports:
+        - port: 8081
+          targetPort: 8081
+          nodePort: 30000
+```
+
+**Apply the mongo-express.yaml**
+
+```
+k apply -f mongo-express.yaml
+```
+
+**If using minikube, expose the port**
+
+```
+minikube service mongo-express-service
+```
